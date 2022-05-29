@@ -48,11 +48,11 @@ void sortedByYear();//сортировка элементов по году (п�
 void sortByDuration();//сортировка элементов по длительности (от n-ой и больше)
 void earliestAlbum();//вывод самого раннего альбома исполнителя
 void writeDisksToFile();//запись в файл
-
+int isInt(); //проверка на ввод числа
+char *isSpace(); //проверка на наличие пробелов в строке
 int main() {
     //читаем файл и заполняем структуру внутренними данными
     readDisksFromFile();
-
     //получение выбора пользователя
     int option = inputMenuOption();
 
@@ -117,8 +117,55 @@ int inputMenuOption() {
     cout << "Make your selection (ONLY DIGITS): ";
 
     int option;
-    cin >> option;
+    option = isInt();
     return option;
+}
+
+int isInt(){
+    char test_s[30];
+    int test;
+
+    while(1){
+        cin >> test_s;
+        //функция atoi возвращает 0, если пользователь не ввел число
+        if ((atoi(test_s) == 0 && (test_s[0] != '0'))){
+            cout << "Write number: ";
+        }
+        else {
+            //если пользователь все таки ввел число
+            test = atoi(test_s);
+            //если оно меньше 0, то
+            if (test < 0){
+                //заставляем ввести нормальное число
+                do{
+                    cout << "Write right number: ";
+                    cin >> test;
+                } while (test < 0);
+            }
+            return test;
+        }
+    }
+}
+
+char *isSpace(){
+    string check;
+    int i;
+    //игнорируем первый ввод
+    cin.ignore();
+    //получаем всю введенную строку
+    getline(cin, check);
+    //прочесываем строку в поиске пробелов
+    for(i = 0; i < check.length(); i++){
+        if(isspace(check[i])){
+            //если нашли пробел, меняем на нижнее подчеркивание
+            check[i] = '_';
+        }
+    }
+    //выделяем память под чар, копируем полученный результат
+    char* buf = new char[30];
+    strcpy(buf,check.c_str());
+    //возвращаем нуждающемуся
+    return buf;
 }
 
 void pauseConsole() {
@@ -189,9 +236,9 @@ void inputDiskFromConsole() {
     //выделение памяти
     ptr->name = static_cast<char *>(malloc(64 * sizeof(char)));
 
-    cout << "\nName (use underscale(_) instead of space):";
+    cout << "\nName: ";
     //вписываем название диска
-    cin >> ptr->name;
+    ptr->name = isSpace();
 
     //проверяем, нет ли уже диска с таким названием
     while (tmp != NULL) {
@@ -201,7 +248,7 @@ void inputDiskFromConsole() {
                 //говорим что такой уже есть и даем попробовать снова
                 //пока не будет введено уникальное имя
                 cout << "\n" << ptr->name << " already exists. Try again.\n";
-                cin >> ptr->name;
+                ptr->name = isSpace();
             }while(strcmp(ptr->name, tmp->name) == 0);
             //переключаемся в начало структуры
             tmp = front;
@@ -212,7 +259,7 @@ void inputDiskFromConsole() {
                     //говорим что такой уже есть и даем попробовать снова
                     //пока не будет введено уникальное имя
                     cout << "\n" << ptr->name << " already exists. Try again.\n";
-                    cin >> ptr->name;
+                    ptr->name = isSpace();
                 }while(strcmp(ptr->name, tmp->name) == 0);
             }
         }
@@ -232,8 +279,8 @@ void inputDiskFromConsole() {
 
     //выделение памяти
     ptr->author = static_cast<char *>(malloc(64 * sizeof(char)));
-    cout << "\nAuthor (use underscale(_) instead of space):";
-    cin >> ptr->author;
+    cout << "\nAuthor: ";
+    ptr->author = isSpace();
 
 
     addDiskToList(ptr);
@@ -289,7 +336,7 @@ void printList() {
 
 void changeDisk(){
     //выделение памяти
-    char diskName[80];
+    char *diskName = new char[80];
 
     if (front == NULL) {
         cout << "LIST IS EMPTY! \n\n";
@@ -301,7 +348,7 @@ void changeDisk(){
     int i = 0;
     cout << "SEARCH DISK BY NAME\n";
     cout << "\nEnter disk name:";
-    cin >> diskName;
+    diskName = isSpace();
 
     while (tmp != NULL) {
         //ищем элемент с таким же названием
@@ -326,9 +373,14 @@ void changeDisk(){
     if(!i){
         //предлагаем попробовать еще раз
         int choice;
-        cout << "\nWrong input\n";
-        cout << "Do you want to try again?(1-yes, 2-no)";
-        cin >> choice;
+        while(1){
+            cout << "\nWrong input\n";
+            cout << "Do you want to try again?(1-yes, 2-no)";
+            cin >> choice;
+            if(choice == 1 || choice == 2){
+                break;
+            }
+        }
         if(choice == 1){
             //вызываем функцию заново
             void (*func) ();
@@ -336,6 +388,9 @@ void changeDisk(){
             func();
             return;
         }
+        //else if(choice == 2){
+
+        //}
     }
     pauseConsole();
 }
@@ -363,14 +418,14 @@ int inputDeletePos(){
 
     cout << "Amount of disks: " << count;
     cout << "\nEnter position of disk:\n ";
-    cin >> choice;
+    choice = isInt();
 
     //проверяем, не выходит ли выбор за пределы структуры
-    if(choice > amountOfDisks(front)){
+    if(choice > amountOfDisks(front) || choice < 1){
         //если да, предлагаем попробовать еще раз
         cout << "Wrong position!\n";
         cout << "Do you want to try again?(1-yes, 2-no)";
-        cin >> choice;
+        choice = isInt();
         if(choice == 1){
             //вызываем функцию заново
             int (*func) ();
@@ -424,7 +479,7 @@ void sortByYearAndHigher(){
     int chosenYear;
 
     cout << "Which year are you interested in?\n";
-    cin >> chosenYear;
+    chosenYear = isInt();
 
     while (tmp != NULL) {
         //перебираем структуру, если год больше или равен введенному, то
@@ -497,7 +552,7 @@ void sortByDuration(){
     int chosenDur;
 
     cout << "Which duration are you interested in?\n";
-    cin >> chosenDur;
+    chosenDur = isInt();
     //перебираем структуру и выводим элементы,
     //длительность которых >= введеной
     while (tmp != NULL) {
@@ -520,11 +575,16 @@ void sortByDuration(){
 void earliestAlbum(){
 
     disk *tmp = front;
+
+    if(front == NULL){
+        cout << "\nList is empty\n";
+    }
+
     char *chosenArt;
     int i, j, damn, n = 0;
 
     cout << "Which artist are you interested in?\n";
-    cin >> chosenArt;
+    chosenArt = isSpace();
 
     //считаем сколько элементов нам подходит
     while (tmp != NULL) {
