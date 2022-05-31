@@ -269,13 +269,13 @@ void inputDiskFromConsole() {
 
     //последующий ввод остальных данных
     cout << "\nYear:";
-    cin >> ptr->year;
+    ptr->year = isInt();
 
     cout <<"\nAmount of songs:";
-    cin >> ptr->amount;
+    ptr->amount = isInt();
 
     cout << "\nDuration (in min):";
-    cin >> ptr->duration;
+    ptr->duration = isInt();
 
     //выделение памяти
     ptr->author = static_cast<char *>(malloc(64 * sizeof(char)));
@@ -355,15 +355,15 @@ void changeDisk(){
         if(strcmp(diskName, tmp->name) == 0) {
             cout << "-----------------\n";
             cout << "Enter new name for disk (use underscale(_) instead of space): ";
-            cin >> tmp->name;
+            tmp->name = isSpace();
             cout << "Year: ";
-            cin >> tmp->year;
+            tmp->year = isInt();
             cout << "Amount of songs:";
-            cin >> tmp->amount;
+            tmp->amount = isInt();
             cout << "Duration (in min): ";
-            cin >> tmp->duration;
+            tmp->duration = isInt();
             cout << "Author (use underscale(_) instead of space): ";
-            cin >> tmp->author;
+            tmp->author = isSpace();
             cout << "\n-----------------\n";
             i++;//флажок
         }
@@ -376,7 +376,7 @@ void changeDisk(){
         while(1){
             cout << "\nWrong input\n";
             cout << "Do you want to try again?(1-yes, 2-no)";
-            cin >> choice;
+            choice = isInt();
             if(choice == 1 || choice == 2){
                 break;
             }
@@ -449,7 +449,7 @@ void deleteDisk(disk **front){
     if(*front == NULL){
         printf("\nList is empty\n");
     }
-    //повезло, элемент первый по счету, можно не перебирать
+        //повезло, элемент первый по счету, можно не перебирать
     else if (position == 1){
         //очищаем память и удаляем элемент
         *front = current->next;
